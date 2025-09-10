@@ -4,7 +4,6 @@ const http = require('http');
 const { Server } = require('ws');
 const axios = require('axios');
 const session = require('express-session');
-const passport = require('passport');
 
 // Load environment variables from your .env file
 dotenv.config();
@@ -19,12 +18,11 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "demosecret",
     resave: false,
     saveUninitialized: true,
 }));
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 
 // --- Helper Function for ElevenLabs API ---
@@ -80,6 +78,51 @@ wss.on('connection', (ws) => {
     });
     ws.on('close', () => console.log('A client has disconnected.'));
 });
+
+const PYTHON_API_URL = "http://127.0.0.1:8000/translate";
+
+
+app.post("/get-sign", async (req, res) => {
+  try {
+    // 1. Get the 'text' from the incoming request body.
+    const { text } = req.body;
+
+    if (!text) {
+      return res.status(400).send({ error: "The 'text' field is required in the request body." });
+    }
+
+    // 2. Call the Python translation API.
+    const pythonApiResponse = await fetch(PYTHON_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }), // Only send the 'text' field as required by the Python API.
+    });
+
+    // 3. Check if the call to the Python API was successful.
+    if (!pythonApiResponse.ok) {
+      // If not, forward the error from the Python API to the client.
+      const errorText = await pythonApiResponse.text();
+      return res.status(pythonApiResponse.status).send({
+        error: "Failed to get translation from Python API.",
+        details: errorText,
+      });
+    }
+
+    // 4. The Python API returns JSON, so we parse it as JSON.
+    const responseData = await pythonApiResponse.json();
+    
+    // 5. Extract the video_url from the response.
+    const videoUrl = responseData.video_url;
+
+    // 6. Send the video URL back to the client.
+    res.status(200).send({ video_url: videoUrl });
+
+  } catch (err) {
+    console.error("Error in /get-sign endpoint:", err);
+    res.status(500).send({ error: err.message });
+  }
+});
+
 
 // --- Start the Server ---
 const PORT = process.env.PORT || 3000;
