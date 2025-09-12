@@ -6,7 +6,32 @@
 
 **SignBridge** is a cutting-edge real-time American Sign Language (ASL) translation system that converts hand gestures into speech using advanced computer vision and AI technologies.
 
-![SignBridge Demo](https://via.placeholder.com/800x400/0066ff/ffffff?text=SignBridge+Demo)
+## 🖼️ Demo & Screenshots
+
+### 🎬 Live Demo Screenshots
+
+<div align="center">
+  <img src="assets/images/Demo1.png" alt="SignBridge Demo 1 - Main Interface" width="800"/>
+  <p><em>SignBridge Main Interface with Real-time ASL Detection</em></p>
+</div>
+
+<div align="center">
+  <img src="assets/images/Demo2.png" alt="SignBridge Demo 2 - ASL Recognition" width="800"/>
+  <p><em>Live ASL Gesture Recognition in Action</em></p>
+</div>
+
+<div align="center">
+  <img src="assets/images/Demo3.png" alt="SignBridge Demo 3 - Text Output" width="800"/>
+  <p><em>Real-time Text Translation and Speech Output</em></p>
+</div>
+
+### 🎯 Key Features Showcase
+
+| 🚀 **Real-time Detection** | 🎤 **Text-to-Speech** | 🎨 **Modern UI** |
+|---------------------------|----------------------|------------------|
+| 60+ ASL words detected instantly | Natural speech using ElevenLabs AI | Beautiful glassmorphism design |
+| Anti-flickering technology | Adjustable volume control | Responsive mobile-friendly interface |
+| Stable gesture recognition | Live text display | Smooth animations & gradients |
 
 ## ✨ Features
 
