@@ -2,20 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SignBridge Test Client</title>
+    <title>Silent Voices - Live Translation Test</title>
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 2rem; background-color: #f0f0f0; }
-        video { border: 3px solid #555; border-radius: 8px; background-color: #000; }
-        #response { margin-top: 1rem; font-weight: bold; font-size: 1.2rem; color: #333; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+        body { font-family: 'Poppins', sans-serif; text-align: center; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        h1 { color: #1a1a1a; margin-bottom: 20px; }
+        video { border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; height: auto; background-color: #000; }
+        .controls {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        #startButton {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background-color: #007aff;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        #startButton:disabled { background-color: #ccc; cursor: not-allowed; }
+        .volume-control { display: flex; align-items: center; gap: 10px; }
+        #volumeSlider { cursor: pointer; }
+        .response-area { margin-top: 15px; }
+        #live-text {
+            font-weight: 600;
+            background-color: #eef1f4;
+            border: 1px solid #ddd;
+            color: #111;
+            font-size: 2em;
+            letter-spacing: 3px;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 1.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #response { color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
-<h1>SignBridge Live Backend Test</h1>
-<video id="video" width="600" height="450" autoplay muted playsinline></video>
-<p>Server Response:</p>
-<div id="response">Attempting to connect...</div>
-
+<div class="container">
+    <h1>Silent Voices</h1>
+    <video id="video" autoplay muted playsinline></video>
+    <div class="controls">
+        <button id="startButton">Start Translation</button>
+        <div class="volume-control">
+            <span>🔈</span>
+            <input type="range" id="volumeSlider" min="0" max="1" value="1" step="0.01">
+            <span>🔊</span>
+        </div>
+    </div>
+    <div class="response-area">
+        <p>Live Text:</p>
+        <div id="live-text">...</div>
+        <p id="response">Status: Disconnected</p>
+    </div>
+</div>
 <script src="/script.js"></script>
 </body>
 </html>
-
