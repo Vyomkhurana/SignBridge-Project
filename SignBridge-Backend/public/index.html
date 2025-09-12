@@ -2,70 +2,461 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Silent Voices - Live Translation Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignBridge - Real-time Hand Sign Translation</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-        body { font-family: 'Poppins', sans-serif; text-align: center; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-        h1 { color: #1a1a1a; margin-bottom: 20px; }
-        video { border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; height: auto; background-color: #000; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --primary-blue: #0066ff;
+            --primary-purple: #8b5cf6;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 198, 119, 0.3) 0%, transparent 50%);
+            animation: gradient 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradient {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* Main grid layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Video section */
+        .video-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            animation: slideLeft 0.8s ease-out;
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            background: #000;
+            border-radius: 15px;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Controls */
         .controls {
-            margin: 25px 0;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
+
         #startButton {
-            padding: 12px 25px;
-            font-size: 1.1em;
+            flex: 1;
+            min-width: 180px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
             font-weight: 600;
-            cursor: pointer;
-            border-radius: 8px;
             border: none;
-            background-color: #007aff;
-            color: white;
-            transition: background-color 0.2s;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
         }
-        #startButton:disabled { background-color: #ccc; cursor: not-allowed; }
-        .volume-control { display: flex; align-items: center; gap: 10px; }
-        #volumeSlider { cursor: pointer; }
-        .response-area { margin-top: 15px; }
-        #live-text {
+
+        #startButton:not(:disabled) {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+        }
+
+        #startButton:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        #startButton:disabled {
+            background: #374151;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #startButton.stop {
+            background: linear-gradient(135deg, var(--accent-red), #dc2626);
+        }
+
+        #startButton.stop:hover {
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .volume-control span {
+            font-size: 1.2rem;
+        }
+
+        #volumeSlider {
+            width: 80px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            cursor: pointer;
+            border: none;
+            appearance: none;
+        }
+
+        /* Side panel */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: slideRight 0.8s ease-out;
+        }
+
+        .panel-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+        }
+
+        .panel-card h3 {
+            font-size: 1.3rem;
             font-weight: 600;
-            background-color: #eef1f4;
-            border: 1px solid #ddd;
-            color: #111;
-            font-size: 2em;
-            letter-spacing: 3px;
-            padding: 15px;
-            border-radius: 8px;
-            min-height: 1.8em;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        /* Live text display */
+        .live-text-container {
+            text-align: center;
+        }
+
+        #live-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
-        #response { color: #666; margin-top: 10px; }
+
+        #live-text.active {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        #live-text.empty {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Status display */
+        .status-container {
+            text-align: center;
+        }
+
+        #response {
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        #response.connected {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        #response.disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        #response.processing {
+            background: rgba(8, 145, 178, 0.2);
+            color: #0891b2;
+            border: 1px solid rgba(8, 145, 178, 0.3);
+        }
+
+        /* Word building display */
+        .word-builder {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .word-builder h4 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #current-word {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--primary-blue);
+            min-height: 30px;
+        }
+
+        /* Vocabulary showcase */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .vocab-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .vocab-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            #startButton {
+                min-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Silent Voices</h1>
-    <video id="video" autoplay muted playsinline></video>
-    <div class="controls">
-        <button id="startButton">Start Translation</button>
-        <div class="volume-control">
-            <span>🔈</span>
-            <input type="range" id="volumeSlider" min="0" max="1" value="1" step="0.01">
-            <span>🔊</span>
+    <div class="container">
+        <div class="header">
+            <h1>SignBridge</h1>
+            <p class="subtitle">Real-time American Sign Language Translation</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="video" autoplay muted playsinline></video>
+                    <div class="video-overlay" id="video-status">Camera Ready</div>
+                </div>
+
+                <div class="controls">
+                    <button id="startButton">Start Translation</button>
+                    <div class="volume-control">
+                        <span>🔈</span>
+                        <input type="range" id="volumeSlider" min="0" max="1" value="1" step="0.01">
+                        <span>🔊</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-panel">
+                <div class="panel-card live-text-container">
+                    <h3>Detected Word</h3>
+                    <div id="live-text" class="empty">Ready to detect...</div>
+                    <div class="word-builder">
+                        <h4>Building Word</h4>
+                        <div id="current-word">...</div>
+                    </div>
+                </div>
+
+                <div class="panel-card status-container">
+                    <h3>System Status</h3>
+                    <div id="response" class="disconnected">Disconnected - Click Start to begin</div>
+                </div>
+
+                <div class="panel-card">
+                    <h3>Available Words</h3>
+                    <div class="vocab-grid">
+                        <div class="vocab-item">HELLO</div>
+                        <div class="vocab-item">YES</div>
+                        <div class="vocab-item">NO</div>
+                        <div class="vocab-item">GOOD</div>
+                        <div class="vocab-item">LOVE</div>
+                        <div class="vocab-item">WATER</div>
+                        <div class="vocab-item">FOOD</div>
+                        <div class="vocab-item">HELP</div>
+                        <div class="vocab-item">THANK YOU</div>
+                        <div class="vocab-item">PLEASE</div>
+                        <div class="vocab-item">SORRY</div>
+                        <div class="vocab-item">MORE...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="response-area">
-        <p>Live Text:</p>
-        <div id="live-text">...</div>
-        <p id="response">Status: Disconnected</p>
-    </div>
-</div>
-<script src="/script.js"></script>
+
+    <script src="/script.js"></script>
 </body>
 </html>
