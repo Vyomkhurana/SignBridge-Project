@@ -1,4 +1,4 @@
-# 🌉 SignBridge - Real-time ASL Translation System
+# 🌉 SignBridge - Real-time Hand Sign Translation System
 
 [![Node.js](https://img.shields.io/badge/Node.js-v16+-green.svg)](https://nodejs.org/)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org/)
@@ -303,10 +303,6 @@ if (DEBUG) console.log('Debug info:', data);
 - Ensure good lighting for better detection
 - Keep background simple and contrasting
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
 ### Development Setup
 
 1. Fork the repository
@@ -323,11 +319,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - **Backend**: Standard JavaScript style
 - **Python**: PEP 8 + Black formatter
 
-## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [MediaPipe](https://mediapipe.dev/) - Hand tracking and gesture recognition
 - [ElevenLabs](https://elevenlabs.io/) - High-quality text-to-speech
